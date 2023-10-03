@@ -14,6 +14,7 @@
         <DockPanel DockPanel.Dock="Top">
             <Button DockPanel.Dock="Right" Content="Remove" Command="{Binding RemoveCommand}" CommandParameter="{Binding SelectedFile}"/>
             <Button DockPanel.Dock="Right" Content="Add" Command="{Binding AddCommand}"/>
+            <Button DockPanel.Dock="Right" Content="FillGrid" Command="{Binding FillGridCommand}" Margin="2 0" />
             <UniformGrid Rows="1">
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Left" Text="Title:" Margin="5,0,2,0"/>

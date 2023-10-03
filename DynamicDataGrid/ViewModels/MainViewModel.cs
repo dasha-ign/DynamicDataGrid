@@ -11,13 +11,15 @@ namespace DynamicDataGrid.ViewModels;
 [MarkupExtensionReturnType(typeof(MainViewModel))]
 public class MainViewModel() : TitledViewModel("Главное окно")
 {
-    private ObservableCollection<DataViewModel> _Files = new()
-    {
-        new("File 1", @"c:\data\data_file1.txt"),
-        new("File 2", @"c:\data\d1\data_file2.txt"),
-        new("File 3", @"c:\data\d2\d3\data_file3.txt"),
-        new("File 4", @"c:\data\d3\d5\d7\d8\data_file4.txt"),
-    };
+    private ObservableCollection<DataViewModel> _Files
+    //    = new()
+    //{
+    //    new("File 1", @"c:\data\data_file1.txt"),
+    //    new("File 2", @"c:\data\d1\data_file2.txt"),
+    //    new("File 3", @"c:\data\d2\d3\data_file3.txt"),
+    //    new("File 4", @"c:\data\d3\d5\d7\d8\data_file4.txt"),
+    //}
+        ;
 
     public ObservableCollection<DataViewModel> Files { get => _Files; set => Set(ref _Files!, value); }
 
@@ -59,6 +61,24 @@ public class MainViewModel() : TitledViewModel("Главное окно")
     private Command? _AddCommand;
 
     public ICommand AddCommand => _AddCommand ??= Command.New(() => _Files?.Add(new(_NewFileName, _NewFilePath)));
+
+    private Command? _FillGridCommand;
+
+    public ICommand FillGridCommand => _FillGridCommand ??= Command.New(() => FillGrid());
+
+    private void FillGrid()
+    {
+        _Files = new()
+        {
+        new("File 1", @"c:\data\data_file1.txt"),
+        new("File 2", @"c:\data\d1\data_file2.txt"),
+        new("File 3", @"c:\data\d2\d3\data_file3.txt"),
+        new("File 4", @"c:\data\d3\d5\d7\d8\data_file4.txt"),
+        };
+
+        OnPropertyChanged(nameof(Files));
+
+    }
 
 
 }
