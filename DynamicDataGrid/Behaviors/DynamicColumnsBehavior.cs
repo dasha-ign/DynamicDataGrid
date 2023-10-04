@@ -47,7 +47,7 @@ public class DynamicColumnsBehavior : Behavior<DataGrid>
     private void RegenerateColumns(IEnumerable<DataViewModel>? Items)
     {
         AssociatedObject.Columns.Clear();
-        if(Items is null) return;
+        if(Items is null || !Items.Any()) return;
 
         AssociatedObject.Columns.Add(new DataGridTextColumn { Header = "Title", Binding = new Binding("Title") });
         AssociatedObject.Columns.Add(new DataGridTextColumn { Header = "Path", Binding = new Binding("FilePath") });

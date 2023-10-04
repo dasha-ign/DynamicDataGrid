@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows.Markup;
+using DynamicDataGrid.Base;
 using DynamicDataGrid.Services;
 using MathCore.WPF.Commands;
 using MathCore.WPF.ViewModels;
@@ -10,25 +11,45 @@ using Ookii.Dialogs.Wpf;
 namespace DynamicDataGrid.ViewModels;
 
 [MarkupExtensionReturnType(typeof(MainViewModel))]
-public class MainViewModel() : TitledViewModel("Главное окно")
+public class MainViewModel : TitledViewModel
 {
     private readonly IFileService _fileService = new FileService();
 
-    private ObservableCollection<DataViewModel> _Files
-        = new()
+    //private ObservableCollection<DataViewModel> _Files
+    //    = new()
+    //{
+    //    new("File 1", @"c:\data\data_file1.txt"),
+    //    new("File 2", @"c:\data\d1\data_file2.txt"),
+    //    new("File 3", @"c:\data\d2\d3\data_file3.txt"),
+    //    new("File 4", @"c:\data\d3\d5\d7\d8\data_file4.txt"),
+    //}
+    //    ;
+
+    //public ObservableCollection<DataViewModel> Files { get => _Files; set => Set(ref _Files!, value); }
+
+
+    #region Files : AwesomeObservableCollection<DataViewModel> - list of files
+
+    ///<summary>list of files</summary>
+    private AwesomeObservableCollection<DataViewModel> _Files = new();
+
+    ///<summary>list of files</summary>
+    public AwesomeObservableCollection<DataViewModel> Files
     {
-        new("File 1", @"c:\data\data_file1.txt"),
-        new("File 2", @"c:\data\d1\data_file2.txt"),
-        new("File 3", @"c:\data\d2\d3\data_file3.txt"),
-        new("File 4", @"c:\data\d3\d5\d7\d8\data_file4.txt"),
+        get => _Files;
+        set
+        {
+            Set(ref _Files, value);
+
+        }
     }
-        ;
 
-    public ObservableCollection<DataViewModel> Files { get => _Files; set => Set(ref _Files!, value); }
+    #endregion
 
-    #region property SelectedFile : DataViewModel - Выбранный файл
 
-    /// <Summary>Выбранный файл</Summary>
+        #region property SelectedFile : DataViewModel - Выбранный файл
+
+        /// <Summary>Выбранный файл</Summary>
     private DataViewModel? _SelectedFile;
 
     /// <Summary>Выбранный файл</Summary>
@@ -71,13 +92,12 @@ public class MainViewModel() : TitledViewModel("Главное окно")
 
     private void FillGrid()
     {
-        _Files = new()
-        {
-        new("File 1", @"c:\data\data_file1.txt"),
-        new("File 2", @"c:\data\d1\data_file2.txt"),
-        new("File 3", @"c:\data\d2\d3\data_file3.txt"),
-        new("File 4", @"c:\data\d3\d5\d7\d8\data_file4.txt"),
-        };
+        ObservableCollection<DataViewModel> filesToAdd = new ObservableCollection<DataViewModel> {new("File 1", @"c:\data\data_file1.txt"),
+            new("File 2", @"c:\data\d1\data_file2.txt"),
+            new("File 3", @"c:\data\d2\d3\data_file3.txt"),
+            new("File 4", @"c:\data\d3\d5\d7\d8\data_file4.txt") };
+
+        _Files.AddItemsRange(filesToAdd);
 
         OnPropertyChanged(nameof(Files));
 
@@ -94,10 +114,15 @@ public class MainViewModel() : TitledViewModel("Главное окно")
         if (!dialog.ShowDialog() == true)
             return;
 
-        _Files = new ObservableCollection<DataViewModel>(await _fileService.CreateItemList(dialog.SelectedPath));
+        _Files.Clear();
+
+        _Files.AddItemsRange(await _fileService.CreateItemList(dialog.SelectedPath));
 
         OnPropertyChanged(nameof(Files));
     }
 
-
+    public MainViewModel() : base("The title")
+    {
+        //FillGrid();
+    }
 }
