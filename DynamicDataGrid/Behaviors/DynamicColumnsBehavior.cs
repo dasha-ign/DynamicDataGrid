@@ -21,7 +21,8 @@ public class DynamicColumnsBehavior : Behavior<DataGrid>
 
         AssociatedObject.SourceUpdated += OnSourceUpdated;
         AssociatedObject.AutoGenerateColumns = false;
-        UpdateItemSource(AssociatedObject.ItemsSource);
+//        var itemsSource = AssociatedObject.ItemsSource;
+        UpdateItemSource(CollectionViewSource.GetDefaultView(AssociatedObject.ItemsSource)?.SourceCollection);
     }
 
     protected override void OnDetaching()
@@ -37,11 +38,11 @@ public class DynamicColumnsBehavior : Behavior<DataGrid>
     {
         if (_LastItemSource is INotifyCollectionChanged last_source)
             last_source.CollectionChanged -= OnSourceCollectionChanged;
-        if (NewItemSource is INotifyCollectionChanged new_source)
+        if (CollectionViewSource.GetDefaultView(NewItemSource)?.SourceCollection is INotifyCollectionChanged new_source)
             new_source.CollectionChanged += OnSourceCollectionChanged;
         _LastItemSource = NewItemSource;
 
-        RegenerateColumns(NewItemSource as IEnumerable<DataViewModel>);
+        RegenerateColumns(CollectionViewSource.GetDefaultView(NewItemSource)?.SourceCollection as IEnumerable<DataViewModel>);
     }
 
     private void RegenerateColumns(IEnumerable<DataViewModel>? Items)

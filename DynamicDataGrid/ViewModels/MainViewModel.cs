@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Markup;
 using DynamicDataGrid.Base;
@@ -15,17 +17,6 @@ public class MainViewModel : TitledViewModel
 {
     private readonly IFileService _fileService = new FileService();
 
-    //private ObservableCollection<DataViewModel> _Files
-    //    = new()
-    //{
-    //    new("File 1", @"c:\data\data_file1.txt"),
-    //    new("File 2", @"c:\data\d1\data_file2.txt"),
-    //    new("File 3", @"c:\data\d2\d3\data_file3.txt"),
-    //    new("File 4", @"c:\data\d3\d5\d7\d8\data_file4.txt"),
-    //}
-    //    ;
-
-    //public ObservableCollection<DataViewModel> Files { get => _Files; set => Set(ref _Files!, value); }
 
 
     #region Files : AwesomeObservableCollection<DataViewModel> - list of files
@@ -39,10 +30,27 @@ public class MainViewModel : TitledViewModel
         get => _Files;
         set
         {
-            Set(ref _Files, value);
+           if (Set(ref _Files, value))
+            {
+                _FilesCollectionViewSource = new CollectionViewSource()
+                {
+                    Source = value
+                };
+                _FilesCollectionViewSource.Filter += _FilesCollectionViewSource_Filter;
+                _FilesCollectionViewSource.View?.Refresh();
+                OnPropertyChanged(nameof(FilesCollectionView));
+            }
 
         }
     }
+
+    private void _FilesCollectionViewSource_Filter(object sender, FilterEventArgs e)
+    {
+        e.Accepted = true;
+    }
+
+    private CollectionViewSource _FilesCollectionViewSource;
+    public ICollectionView FilesCollectionView => _FilesCollectionViewSource?.View;
 
     #endregion
 
@@ -113,12 +121,13 @@ public class MainViewModel : TitledViewModel
         var dialog = new VistaFolderBrowserDialog { Multiselect = false };
         if (!dialog.ShowDialog() == true)
             return;
+        Files = Files ?? new();
+       Files.Clear();
 
-        _Files.Clear();
+        Files.AddItemsRange(await _fileService.CreateItemList(dialog.SelectedPath));
 
-        _Files.AddItemsRange(await _fileService.CreateItemList(dialog.SelectedPath));
-
-        OnPropertyChanged(nameof(Files));
+      //  OnPropertyChanged(nameof(Files));
+        FilesCollectionView?.Refresh();
     }
 
     public MainViewModel() : base("The title")

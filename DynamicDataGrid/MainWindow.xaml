@@ -27,7 +27,7 @@
                 </DockPanel>
             </UniformGrid>
         </DockPanel>
-        <DataGrid ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile}">
+        <DataGrid ItemsSource="{Binding FilesCollectionView, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"  SelectedItem="{Binding SelectedFile}">
             <i:Interaction.Behaviors>
                 <b:DynamicColumnsBehavior/>
             </i:Interaction.Behaviors>
